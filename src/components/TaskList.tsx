@@ -1,74 +1,36 @@
-import { useCallback, useState } from "react";
-import { AgGridReact, AgGridColumn } from "ag-grid-react";
-import { GridApi, GridReadyEvent, RowDataUpdatedEvent } from "ag-grid-community";
-import { Button } from 'antd';
-import { ITask } from "../data/declare";
+import React, {useCallback, useMemo, useState} from "react";
+import {AgGridReact, AgGridColumn} from "ag-grid-react";
+import {Button} from 'antd';
+import { FileAddTwoTone, DeleteTwoTone } from '@ant-design/icons';
 
-interface ITaskListManager {
-  data: Array<any>
-  onGridReady(params: GridReadyEvent): void
-  onRowDataUpdated(params: RowDataUpdatedEvent): void
-  createTask(): void
-}
-
-function useTaskListManager(props: TaskListProps): ITaskListManager {
-
-  const [gridApi, setGridApi] = useState<GridApi>();
-
-  const createTask = () => {
-    const rs = gridApi?.applyTransaction({
-      add: [{ id: Date.now() }]
-    });
-    console.log('rs', rs)
-  }
-
-  const getRowData = () => {
-    const rowData: Array<ITask> = [];
-    gridApi?.forEachNode(function (node) {
-      rowData.push(node.data);
-    });
-    return rowData;
-  }
-
-  const onGridReady = (params: GridReadyEvent) => {
-    setGridApi(params.api);
-  };
-
-  const onRowDataUpdated = (params: RowDataUpdatedEvent) => {
-    const rowData = getRowData();
-    props.onDataChanged(rowData);
-    console.log('row data changed', rowData);
-  }
-
-
-
-  return {
-    data: props.rowData,
-    onGridReady,
-    onRowDataUpdated,
-    createTask
-  }
-}
-
+import {ITask, TaskCategoryEnum} from "../data/declare";
+import {useGridDataManager} from "./hooks/useGridDataManager";
 
 
 export type TaskListProps = {
-  rowData: Array<ITask>;
+  data: Array<ITask>;
   onDataChanged: (data: Array<ITask>) => void;
 };
 
-export const TaskList: React.FunctionComponent<TaskListProps> = (props) => {
-  const { data, onGridReady, onRowDataUpdated, createTask } = useTaskListManager(props);
+export const TaskList: React.FunctionComponent<TaskListProps> = React.memo((props) => {
+  const {data, onGridReady, onRowDataUpdated, onCellValueChanged, create, remove} = useGridDataManager(props);
 
   return (
     <div className="task-list">
-      <Button type="primary" onClick={() => createTask()} >新增任务</Button>
+      <div className={"grid-header"}>
+        <Button type="primary" icon={<FileAddTwoTone />} shape={'circle'} onClick={() => create()} />
+        <Button type="default" icon={<DeleteTwoTone />} shape={'round'} onClick={() => remove()}>选中</Button>
+      </div>
       <AgGridReact
+        className={"grid"}
         getRowNodeId={data => data.id}
-        singleClickEdit={true}
+        // singleClickEdit={true}
         rowData={data}
+        rowSelection={'single'}
+        suppressScrollOnNewData={true}
         onGridReady={onGridReady}
         onRowDataUpdated={onRowDataUpdated}
+        onCellValueChanged={onCellValueChanged}
       >
         <AgGridColumn
           field="id"
@@ -85,14 +47,23 @@ export const TaskList: React.FunctionComponent<TaskListProps> = (props) => {
           cellEditor="agTextCellEditor"
         />
         <AgGridColumn
+          field="category"
+          headerName="类型"
+          width={100}
+          editable={true}
+          cellEditor="agPopupSelectCellEditor"
+          cellEditorParams={{values: Object.values(TaskCategoryEnum)}}
+        />
+        <AgGridColumn
           field="descriptions"
           headerName="描述"
           flex={1}
           width={200}
+          minWidth={200}
           editable={true}
           cellEditor="agLargeTextCellEditor"
         />
       </AgGridReact>
     </div>
-  );
-};
+  )
+});

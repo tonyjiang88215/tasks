@@ -1,70 +1,76 @@
-import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import React, {useEffect, useState} from "react";
 
-import { ITask } from "./data/declare";
+import {ITask, ITaskDependencies} from "./data/declare";
 
-import { GraphChart } from "./components/GraphChart";
-import { SankeyChart } from "./components/SankeyChart";
-import { Tasks } from "./components/Tasks";
+import {Header} from "./components/Header";
+import {Tasks} from "./components/Tasks";
+import {Charts} from "./components/Charts";
 
 interface IStatement {
   tasks: Array<ITask>;
+  dependencies: Array<ITaskDependencies>;
   actions: {
     onTaskChanged(tasks: Array<ITask>): void;
+    onDependenciesChanged(dependencies: Array<ITaskDependencies>): void;
   };
 }
 
-function useTasks(): [Array<ITask>, Dispatch<SetStateAction<Array<ITask>>>] {
-  const [tasks, updateTasks ] = useState<Array<ITask>>([]);
+function useTasks() {
+  const [tasks, onTaskChanged] = useState<Array<ITask>>([]);
+  const [dependencies, onDependenciesChanged] = useState<Array<ITaskDependencies>>([]);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const data = loadData();
+  //   console.log('load data', data);
+  //   onTaskChanged(data.tasks);
+  //   onDependenciesChanged(data.dependencies);
+  //
+  // }, [])
 
-  }, [])
-
-  return [tasks, updateTasks];
-
-  // const taskRef = useRef<Array<ITask>>([]);
-  // return [
-  //   taskRef.current,
-  //   (tasks: Array<ITask>) => taskRef.current = tasks
-  // ]
+  return {
+    tasks, onTaskChanged,
+    dependencies, onDependenciesChanged
+  }
 }
 
 function useStatement(): IStatement {
-  const [tasks, onTaskChanged] = useTasks();
+  const {tasks, onTaskChanged, dependencies, onDependenciesChanged} = useTasks();
 
   return {
     tasks,
+    dependencies,
     actions: {
-      onTaskChanged
+      onTaskChanged,
+      onDependenciesChanged
     }
   };
 }
 
 export const App = () => {
-  const { tasks, actions } = useStatement();
-  const { onTaskChanged } = actions;
+  const {tasks, dependencies, actions} = useStatement();
+  const {onTaskChanged, onDependenciesChanged} = actions;
   console.log('app render', tasks);
 
   return (
     <>
-      <h3>企企四季度目标依赖关系</h3>
-      <Tabs forceRenderTabPanel={true}>
-        <TabList>
-          <Tab>任务清单</Tab>
-          <Tab>关系图</Tab>
-          <Tab>执行顺序图</Tab>
-        </TabList>
-        <TabPanel>
-          <Tasks tasks={tasks} onTaskChanged={onTaskChanged} />
-        </TabPanel>
-        <TabPanel>
-          <GraphChart tasks={tasks} dependencies={[]} />
-        </TabPanel>
-        <TabPanel>
-          <SankeyChart tasks={tasks} dependencies={[]} />
-        </TabPanel>
-      </Tabs>
+      <div className={"app-container"}>
+        <div className={"header"}>
+          <Header tasks={tasks} dependencies={dependencies} onTaskChanged={onTaskChanged} onDependenciesChanged={onDependenciesChanged} />
+        </div>
+        <div className={"app-content-container"}>
+          <div className={"graph-container"}>
+            <Charts tasks={tasks} dependencies={dependencies} />
+          </div>
+          <div className={"list-container"}>
+            <Tasks
+              tasks={tasks}
+              dependencies={dependencies}
+              onTaskChanged={onTaskChanged}
+              onDependenciesChanged={onDependenciesChanged}/>
+          </div>
+        </div>
+      </div>
+
     </>
   );
 };

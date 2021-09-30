@@ -17,24 +17,45 @@ import { documentations } from "./tasks/documentations";
 import { cook } from "./cooks";
 import { ITaskPackages } from './declare';
 
-export function loadData(type: MrCookEnum) {
-  return cook(
-    type,
-    
+export function loadData() {
+
+  return [
     asyncParadigms,
     billTypes,
-    customizedForms, 
+    customizedForms,
     ecaRules,
     forms,
     microApps,
     microBFFs,
     querySolutions,
     refers,
-    // stocks, 
+    // stocks,
     webUnpacks,
     trekUnpacks,
     documentations
-  );
+  ].reduce((packages, tasks) => {
+    packages.tasks = [...packages.tasks, ...tasks.tasks];
+    packages.dependencies = [...packages.dependencies, ...tasks.dependencies];
+    return packages;
+  }, { tasks: [], dependencies: []})
+
+  // return cook(
+  //   type,
+  //
+  //   asyncParadigms,
+  //   billTypes,
+  //   customizedForms,
+  //   ecaRules,
+  //   forms,
+  //   microApps,
+  //   microBFFs,
+  //   querySolutions,
+  //   refers,
+  //   // stocks,
+  //   webUnpacks,
+  //   trekUnpacks,
+  //   documentations
+  // );
 }
 
 export function cookData(type: MrCookEnum, ...packages: Array<ITaskPackages>) {

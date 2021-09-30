@@ -30,20 +30,83 @@ html, body {
   flex-direction: column;
 }
 
+
 #root .tasks {
   display: flex;
   flex: 1;
   flex-direction: row;
-  gap: 4px;
+  gap: 8px;
 }
 
 .task-list, .task-dependencies {
   flex: 1;
-  /* display: flex;
-  flex-direction: column; */
+  display: flex;
+  flex-direction: column;
 }
 
-.task-list{
-  flex: 2;
+.grid {
+  display: flex;
+  flex-direction: column;
 }
 
+.grid-header {
+  padding: 2px 0;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+
+.app-container{
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: row;
+  align-content: space-between;
+}
+
+.header-left, .header-right {
+  display: flex;
+  flex: 1;
+}
+
+.header-right{
+  flex-direction: row-reverse;
+  gap: 10px;
+}
+
+.app-content-container{
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.graph-container{
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  border-bottom: 1px solid #ddd;
+}
+
+.graph-container .chart-item{
+  flex: 1;
+}
+
+.list-container{
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+@media only screen and (min-width: 1500px) {
+  .app-content-container{
+    flex-direction: row;
+  }
+
+}

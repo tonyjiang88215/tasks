@@ -1,58 +1,87 @@
-import { useState } from "react";
-import { AgGridReact, AgGridColumn } from "ag-grid-react";
-import { GridApi, GridReadyEvent } from "ag-grid-community";
-import { Button } from 'antd';
+import React from "react";
+import {AgGridReact, AgGridColumn} from "ag-grid-react";
+import {Button} from 'antd';
+import { FileAddTwoTone, DeleteTwoTone } from '@ant-design/icons';
 
-function useGridReadyHandler() {
-  const [gridApi, setGridApi] = useState<GridApi>();
-
-  return (params: GridReadyEvent) => {
-    setGridApi(params.api);
-  };
-}
+import {ITask, ITaskDependencies, TaskDependentTypeEnum} from "../data/declare";
+import {useGridDataManager} from "./hooks/useGridDataManager";
+import {useDescriptions} from "./hooks/useDescriptions";
 
 export type TaskDependenciesProps = {
-  rowData: Array<{ id: string; name: string; descriptions: Array<string> }>;
+  tasks: Array<ITask>,
+  data: Array<ITaskDependencies>;
+  onTaskChanged: (data: Array<ITask>) => void;
+  onDataChanged: (data: Array<ITaskDependencies>) => void;
 };
 
-export const TaskDependencies: React.FunctionComponent<TaskDependenciesProps> = (
-  props
-) => {
-  const { rowData } = props;
-
-  const onGridReady = useGridReadyHandler();
+export const TaskDependencies: React.FunctionComponent<TaskDependenciesProps> = (props) => {
+  const {data, onGridReady, onRowDataUpdated, onCellValueChanged, create, remove} = useGridDataManager(props);
+  const taskSelectValues = useTaskSelectValues(props.tasks);
+  const relationValues = useRelationValues();
+  const { valueGetter, valueSetter } = useDescriptions();
 
   return (
     <div className="task-dependencies">
-      <Button type="primary" >新增依赖</Button>
+      <div className={"grid-header"}>
+        <Button type="primary" icon={<FileAddTwoTone />} shape={'circle'} onClick={() => create()} />
+        <Button type="default" icon={<DeleteTwoTone />} shape={'round'} onClick={() => remove()}>选中</Button>
+      </div>
       <AgGridReact
-        singleClickEdit={true}
-        rowData={rowData}
+        className={"grid"}
+        getRowNodeId={data => data.id}
+        // singleClickEdit={true}
+        rowData={data}
+        rowSelection={'single'}
+        suppressScrollOnNewData={true}
         onGridReady={onGridReady}
+        onRowDataUpdated={onRowDataUpdated}
+        onCellValueChanged={onCellValueChanged}
       >
         <AgGridColumn
-          field="id"
-          headerName="ID"
-          width={100}
-          editable={true}
-          cellEditor="agTextCellEditor"
-        />
-        <AgGridColumn
-          field="name"
-          headerName="任务名称"
+          field="src"
+          headerName="源任务ID"
           width={200}
           editable={true}
-          cellEditor="agTextCellEditor"
+          cellEditor="agPopupSelectCellEditor"
+          cellEditorParams={{values: taskSelectValues}}
+        />
+        <AgGridColumn
+          field="target"
+          headerName="目标任务ID"
+          width={200}
+          editable={true}
+          cellEditor="agPopupSelectCellEditor"
+          cellEditorParams={{values: taskSelectValues}}
+        />
+        <AgGridColumn
+          field="type"
+          headerName="关系"
+          width={150}
+          editable={true}
+          cellEditor="agPopupSelectCellEditor"
+          cellEditorParams={{values: relationValues}}
         />
         <AgGridColumn
           field="descriptions"
           headerName="描述"
           flex={1}
           width={200}
+          minWidth={200}
           editable={true}
           cellEditor="agLargeTextCellEditor"
+          valueGetter={valueGetter}
+          valueSetter={valueSetter}
         />
       </AgGridReact>
     </div>
   );
 };
+
+
+function useTaskSelectValues(tasks: Array<ITask>) {
+  return tasks.map(task => task.id);
+}
+
+function useRelationValues() {
+  return Object.values(TaskDependentTypeEnum);
+}
