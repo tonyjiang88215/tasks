@@ -28,7 +28,7 @@ export const TaskDependencies: React.FunctionComponent<TaskDependenciesProps> = 
       </div>
       <AgGridReact
         className={"grid"}
-        getRowNodeId={data => data.id}
+        getRowNodeId={data => `${data.src}_${data.target}`}
         // singleClickEdit={true}
         rowData={data}
         rowSelection={'single'}
