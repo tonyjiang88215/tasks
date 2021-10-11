@@ -3,7 +3,7 @@ import {Button, Upload} from "antd";
 import { DownloadOutlined, UploadOutlined, DeleteTwoTone } from '@ant-design/icons';
 import {saveAs} from "file-saver";
 
-import {ITask, ITaskDependencies} from "../data/declare";
+import {ITask, ITaskDependencies, ITaskPackages} from "../data/declare";
 
 
 export type HeaderProps = {
@@ -63,7 +63,7 @@ function useImport(onTaskChanged: (tasks: Array<ITask>) => void, onDependenciesC
       reader.readAsText(file);
       reader.onload = () => {
         if (reader.result) {
-          const data = JSON.parse(reader.result.toString());
+          const data: ITaskPackages = JSON.parse(reader.result.toString());
           onTaskChanged(data.tasks);
           onDependenciesChanged(data.dependencies);
         }

@@ -13,7 +13,7 @@ function putIntoData(
 
     data.nodes.push({
       id: id,
-      name: name,
+      name: `${name}\r\n(${id})`,
       category: category
     });
 

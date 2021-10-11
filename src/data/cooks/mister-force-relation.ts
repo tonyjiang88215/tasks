@@ -21,7 +21,7 @@ function putIntoData(
 
     data.nodes.push({
       id: id,
-      name: name,
+      name: `${name}\n（${id}）`,
       category: category
     });
 

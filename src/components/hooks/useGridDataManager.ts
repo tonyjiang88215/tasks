@@ -63,6 +63,7 @@ export function useGridDataManager(props: GridDataManagerParams): IGridDataManag
 
   const onCellValueChanged = () => {
     const rowData = getRowData();
+    console.log('rowData is', rowData);
     props.onDataChanged(rowData);
   }
 

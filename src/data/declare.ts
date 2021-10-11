@@ -16,14 +16,16 @@ export type ITask = {
   id: string,
   name: string,
   category: TaskCategoryEnum,
-  descriptions?: Array<string>
+  descriptions?: Array<string>,
+  displayInCharts?: boolean
 }
 
 export type ITaskDependencies = {
   src: string,
   target: string,
   type: TaskDependentTypeEnum,
-  descriptions?: Array<string>
+  descriptions?: Array<string>,
+  displayInCharts?: boolean
 }
 
 export type ITaskPackages = {

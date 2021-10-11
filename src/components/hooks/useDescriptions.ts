@@ -2,7 +2,6 @@ import {ValueGetterParams, ValueSetterParams} from "ag-grid-community";
 
 export function useDescriptions() {
   const valueGetter = (params: ValueGetterParams) => {
-    console.log('getter', params);
     if(!params.data.descriptions) {
       return undefined;
     }
@@ -11,8 +10,6 @@ export function useDescriptions() {
   }
 
   const valueSetter = (params: ValueSetterParams) => {
-    console.log('setter', params);
-    console.log('newValue', params.newValue);
     params.data.descriptions = params.newValue.split('\n');
     return true;
   }

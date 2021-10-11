@@ -8,7 +8,9 @@ import {Charts} from "./components/Charts";
 
 interface IStatement {
   tasks: Array<ITask>;
+  tasksInChart: Array<ITask>;
   dependencies: Array<ITaskDependencies>;
+  dependenciesInChart: Array<ITaskDependencies>;
   actions: {
     onTaskChanged(tasks: Array<ITask>): void;
     onDependenciesChanged(dependencies: Array<ITaskDependencies>): void;
@@ -35,10 +37,12 @@ function useTasks() {
 
 function useStatement(): IStatement {
   const {tasks, onTaskChanged, dependencies, onDependenciesChanged} = useTasks();
+  const tasksInChart = tasks.filter(i => i.displayInCharts);
+  const dependenciesInChart = dependencies.filter(i => i.displayInCharts);
 
   return {
-    tasks,
-    dependencies,
+    tasks, tasksInChart,
+    dependencies, dependenciesInChart,
     actions: {
       onTaskChanged,
       onDependenciesChanged
@@ -47,7 +51,7 @@ function useStatement(): IStatement {
 }
 
 export const App = () => {
-  const {tasks, dependencies, actions} = useStatement();
+  const {tasks, tasksInChart, dependencies, dependenciesInChart, actions} = useStatement();
   const {onTaskChanged, onDependenciesChanged} = actions;
   console.log('app render', tasks);
 
@@ -55,11 +59,16 @@ export const App = () => {
     <>
       <div className={"app-container"}>
         <div className={"header"}>
-          <Header tasks={tasks} dependencies={dependencies} onTaskChanged={onTaskChanged} onDependenciesChanged={onDependenciesChanged} />
+          <Header
+            tasks={tasks}
+            dependencies={dependencies}
+            onTaskChanged={onTaskChanged}
+            onDependenciesChanged={onDependenciesChanged}
+          />
         </div>
         <div className={"app-content-container"}>
           <div className={"graph-container"}>
-            <Charts tasks={tasks} dependencies={dependencies} />
+            <Charts tasks={tasksInChart} dependencies={dependenciesInChart}/>
           </div>
           <div className={"list-container"}>
             <Tasks

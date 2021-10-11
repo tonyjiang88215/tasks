@@ -6,6 +6,7 @@ import { FileAddTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import {ITask, ITaskDependencies, TaskDependentTypeEnum} from "../data/declare";
 import {useGridDataManager} from "./hooks/useGridDataManager";
 import {useDescriptions} from "./hooks/useDescriptions";
+import {ICellRendererParams} from "ag-grid-community";
 
 export type TaskDependenciesProps = {
   tasks: Array<ITask>,
@@ -37,6 +38,18 @@ export const TaskDependencies: React.FunctionComponent<TaskDependenciesProps> = 
         onRowDataUpdated={onRowDataUpdated}
         onCellValueChanged={onCellValueChanged}
       >
+        <AgGridColumn
+          field="displayInCharts"
+          headerName="显示"
+          width={50}
+          resizable={true}
+          cellRendererFramework={(params: ICellRendererParams) => {
+            return <input type={'checkbox'} checked={params.value} onChange={ev => {
+              // @ts-ignore
+              params.setValue(ev.target.checked);
+            }} />
+          }}
+        />
         <AgGridColumn
           field="src"
           headerName="源任务ID"
